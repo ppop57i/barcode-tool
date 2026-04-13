@@ -1,231 +1,186 @@
-<!-- ===== 바코드 파일명 변경 툴 FINAL2 | Wave Studio ===== -->
-<!-- 티스토리 스킨 HTML 편집 > </body> 바로 위에 삽입 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바코드 파일명 변경 | Wave Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: #fff; border-radius: 16px; width: min(860px, 100%); padding: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .sub { font-size: 13px; color: #999; margin-bottom: 24px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
+    label { font-size: 12px; color: #999; display: block; margin-bottom: 4px; }
+    select { font-size: 13px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 8px; }
+    .drop-zone { border: 1.5px dashed #ccc; border-radius: 12px; padding: 40px 20px; text-align: center; cursor: pointer; background: #fafafa; transition: background .15s; }
+    .drop-zone:hover { background: #eef1ff; border-color: #5b7fff; }
+    .drop-zone .icon { font-size: 36px; margin-bottom: 10px; }
+    .drop-zone p { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .drop-zone span { font-size: 12px; color: #aaa; }
+    .progress { display: none; margin-top: 16px; }
+    .prog-header { display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-bottom: 6px; }
+    .prog-bar { background: #f0f0f0; border-radius: 99px; height: 6px; overflow: hidden; }
+    .prog-fill { height: 100%; background: #5b7fff; border-radius: 99px; width: 0%; transition: width .2s; }
+    .prog-note { font-size: 12px; color: #aaa; margin-top: 6px; }
+    .result { display: none; margin-top: 24px; }
+    .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .stat { background: #f5f5f5; border-radius: 10px; padding: 10px 16px; text-align: center; min-width: 80px; }
+    .stat .num { font-size: 22px; font-weight: 600; }
+    .stat .lbl { font-size: 12px; color: #999; }
+    .stat.green { background: #edfaf3; } .stat.green .num { color: #1a9e5c; }
+    .stat.red   { background: #fff0f0; } .stat.red .num   { color: #e03e3e; }
+    .stat.amber { background: #fffbea; } .stat.amber .num { color: #d97706; }
+    .table-head { display: grid; grid-template-columns: 36px 1fr 1fr 64px; gap: 8px; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 11px; color: #aaa; font-weight: 500; }
+    .file-list { max-height: 360px; overflow-y: auto; }
+    .group-header { display: flex; align-items: center; gap: 10px; padding: 10px 0 6px; border-bottom: 1px solid #eee; margin-top: 12px; font-size: 13px; font-weight: 500; }
+    .file-row { display: grid; grid-template-columns: 36px 1fr 1fr 64px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f5f5; font-size: 12px; }
+    .thumb { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
+    .name-orig { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #aaa; }
+    .name-input { font-size: 12px; font-weight: 500; border: none; border-bottom: 1px dashed #ccc; background: transparent; outline: none; width: 100%; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+    .badge-ok   { background: #edfaf3; color: #1a9e5c; }
+    .badge-fail { background: #fff0f0; color: #e03e3e; }
+    .actions { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-primary   { background: #5b7fff; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .btn-secondary { background: none; border: 1px solid #ddd; border-radius: 8px; padding: 10px 16px; font-size: 13px; color: #888; cursor: pointer; }
+    .btn-primary:hover { background: #4a6ef0; }
+    .note { font-size: 12px; color: #bbb; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>📁 바코드 파일명 변경</h1>
+  <p class="sub">바코드 태그 이미지 → 상품 이미지 순서로 폴더 선택 · Claude Vision AI 인식 · Wave Studio</p>
 
-<div id="wv-tool-wrap" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center;">
-  <div id="wv-tool-box" style="background:#fff; border-radius:16px; width:min(860px,96vw); max-height:92vh; overflow-y:auto; padding:28px 28px 24px; box-shadow:0 8px 40px rgba(0,0,0,0.18); position:relative;">
-    <a href="javascript:void(0)" id="wv-close-btn" style="position:absolute;top:16px;right:18px;font-size:20px;cursor:pointer;color:#888;text-decoration:none;">✕</a>
-    <h2 style="margin:0 0 4px;font-size:17px;font-weight:600;">바코드 파일명 변경</h2>
-    <p style="margin:0 0 18px;font-size:13px;color:#888;">바코드 태그 이미지 → 상품 이미지 순서로 폴더 선택 · Claude Vision AI 인식</p>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
-      <div>
-        <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">순번 시작</label>
-        <select id="wv-start" style="font-size:13px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;width:72px;">
-          <option value="9" selected>09</option>
-          <option value="1">01</option>
-          <option value="0">00</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">구분자</label>
-        <select id="wv-sep" style="font-size:13px;padding:6px 8px;border:1px solid #ddd;border-radius:8px;width:88px;">
-          <option value="_">_ 언더바</option>
-          <option value="-">- 하이픈</option>
-        </select>
-      </div>
-      <!-- 버튼을 여기 안으로 이동 -->
-      <a href="javascript:void(0)" id="wv-open-btn"
-        style="margin-left:auto;background:#5b7fff;color:#fff;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap;">
-        📁 폴더 선택
-      </a>
+  <div class="row">
+    <div>
+      <label>순번 시작</label>
+      <select id="wv-start">
+        <option value="9" selected>09</option>
+        <option value="1">01</option>
+        <option value="0">00</option>
+      </select>
     </div>
-
-    <div id="wv-drop"
-      style="border:1.5px dashed #ccc;border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;background:#fafafa;transition:background .15s;">
-      <div style="font-size:32px;margin-bottom:8px;">📁</div>
-      <p style="font-size:14px;font-weight:500;margin:0 0 4px;">여기를 클릭하거나 폴더를 드래그하세요</p>
-      <p style="font-size:12px;color:#aaa;margin:0;">파일명 오름차순 기준 처리 · JPG, PNG, WEBP</p>
+    <div>
+      <label>구분자</label>
+      <select id="wv-sep">
+        <option value="_">_ 언더바</option>
+        <option value="-">- 하이픈</option>
+      </select>
     </div>
-    <input type="file" id="wv-input" webkitdirectory multiple accept="image/*" style="display:none">
+  </div>
 
-    <div id="wv-progress" style="display:none;margin-top:14px;">
-      <div style="display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:4px;">
-        <span id="wv-prog-label">AI 인식 중...</span>
-        <span id="wv-prog-count"></span>
-      </div>
-      <div style="background:#f0f0f0;border-radius:99px;height:6px;overflow:hidden;">
-        <div id="wv-prog-fill" style="height:100%;background:#5b7fff;border-radius:99px;width:0%;transition:width .2s;"></div>
-      </div>
-      <p style="font-size:12px;color:#aaa;margin-top:6px;">이미지 압축 후 AI 전송 중 · 바코드 태그만 인식, 상품 이미지는 건너뜁니다.</p>
-    </div>
+  <div class="drop-zone" id="drop-zone">
+    <div class="icon">📁</div>
+    <p>폴더를 선택하거나 드래그하세요</p>
+    <span>파일명 오름차순 기준 처리 · JPG, PNG, WEBP</span>
+  </div>
+  <input type="file" id="wv-input" webkitdirectory multiple accept="image/*" style="display:none">
 
-    <div id="wv-result" style="display:none;margin-top:20px;">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-        <div style="background:#f5f5f5;border-radius:10px;padding:10px 16px;text-align:center;min-width:72px;">
-          <div style="font-size:20px;font-weight:600;" id="wv-st-groups">0</div>
-          <div style="font-size:12px;color:#999;">상품 그룹</div>
-        </div>
-        <div style="background:#edfaf3;border-radius:10px;padding:10px 16px;text-align:center;min-width:72px;">
-          <div style="font-size:20px;font-weight:600;color:#1a9e5c;" id="wv-st-imgs">0</div>
-          <div style="font-size:12px;color:#999;">상품 이미지</div>
-        </div>
-        <div style="background:#fff0f0;border-radius:10px;padding:10px 16px;text-align:center;min-width:72px;">
-          <div style="font-size:20px;font-weight:600;color:#e03e3e;" id="wv-st-fail">0</div>
-          <div style="font-size:12px;color:#999;">인식 실패</div>
-        </div>
-        <div style="background:#fffbea;border-radius:10px;padding:10px 16px;text-align:center;min-width:72px;">
-          <div style="font-size:20px;font-weight:600;color:#d97706;" id="wv-st-skip">0</div>
-          <div style="font-size:12px;color:#999;">상품 이미지</div>
-        </div>
-      </div>
-      <p style="font-size:12px;color:#aaa;margin:0 0 8px;">변경 파일명은 직접 수정 가능합니다.</p>
-      <div style="display:grid;grid-template-columns:36px 1fr 1fr 64px;gap:8px;padding:6px 0;border-bottom:1px solid #eee;">
-        <span></span>
-        <span style="font-size:11px;color:#aaa;font-weight:500;">원본 파일명</span>
-        <span style="font-size:11px;color:#aaa;font-weight:500;">변경 파일명</span>
-        <span style="font-size:11px;color:#aaa;font-weight:500;">상태</span>
-      </div>
-      <div id="wv-list" style="max-height:340px;overflow-y:auto;"></div>
-      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="javascript:void(0)" id="wv-dl-btn"
-          style="display:none;background:#5b7fff;color:#fff;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;">
-          ZIP 다운로드
-        </a>
-        <a href="javascript:void(0)" id="wv-reset-btn"
-          style="background:none;border:1px solid #ddd;border-radius:8px;padding:9px 16px;font-size:13px;color:#888;cursor:pointer;text-decoration:none;">
-          초기화
-        </a>
-      </div>
-      <p style="font-size:12px;color:#bbb;margin-top:8px;">* 바코드 태그 이미지는 ZIP 제외. 인식 실패 파일은 원본명으로 포함.</p>
+  <div class="progress" id="wv-progress">
+    <div class="prog-header">
+      <span id="prog-label">AI 인식 중...</span>
+      <span id="prog-count"></span>
     </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <p class="prog-note">이미지 압축 후 AI 전송 중 · 바코드 태그만 인식, 상품 이미지는 건너뜁니다.</p>
+  </div>
+
+  <div class="result" id="wv-result">
+    <div class="stats">
+      <div class="stat">        <div class="num" id="st-groups">0</div><div class="lbl">상품 그룹</div></div>
+      <div class="stat green"> <div class="num" id="st-imgs">0</div>  <div class="lbl">상품 이미지</div></div>
+      <div class="stat red">   <div class="num" id="st-fail">0</div>  <div class="lbl">인식 실패</div></div>
+      <div class="stat amber"> <div class="num" id="st-skip">0</div>  <div class="lbl">건너뜀</div></div>
+    </div>
+    <p style="font-size:12px;color:#aaa;margin-bottom:8px;">변경 파일명은 직접 수정 가능합니다.</p>
+    <div class="table-head"><span></span><span>원본 파일명</span><span>변경 파일명</span><span>상태</span></div>
+    <div class="file-list" id="file-list"></div>
+    <div class="actions">
+      <button class="btn-primary"   id="dl-btn"    style="display:none">ZIP 다운로드</button>
+      <button class="btn-secondary" id="reset-btn">초기화</button>
+    </div>
+    <p class="note">* 바코드 태그 이미지는 ZIP 제외. 인식 실패 파일은 원본명으로 포함.</p>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-(function(){
   var PROXY_URL = 'https://barcode-proxy.hansoo.workers.dev/api/barcode';
-
-  // 이미지 리사이즈 — 바코드 인식에 충분한 800px로 압축 (속도 개선 핵심)
-  var MAX_SIZE = 800;
-  var QUALITY = 0.85;
-
+  var MAX_SIZE = 800, QUALITY = 0.85;
   var processed = [];
 
-  function wvOpen(){ document.getElementById('wv-tool-wrap').style.display='flex'; }
-  function wvClose(){ document.getElementById('wv-tool-wrap').style.display='none'; }
-  window.wvOpen = wvOpen;
-  window.wvClose = wvClose;
-
-  window.addEventListener('load', function(){
-    var openBtn  = document.getElementById('wv-open-btn');
-    var closeBtn = document.getElementById('wv-close-btn');
-    var dlBtn    = document.getElementById('wv-dl-btn');
-    var resetBtn = document.getElementById('wv-reset-btn');
-    var drop     = document.getElementById('wv-drop');
-    var input    = document.getElementById('wv-input');
-
-    if(openBtn)  openBtn.addEventListener('click',  function(){ input.click(); });
-    if(closeBtn) closeBtn.addEventListener('click', wvClose);
-    if(dlBtn)    dlBtn.addEventListener('click',    wvDownload);
-    if(resetBtn) resetBtn.addEventListener('click', wvReset);
-
-    if(drop){
-      drop.addEventListener('click',    function(){ input.click(); });
-      drop.addEventListener('dragover', function(e){ e.preventDefault(); drop.style.background='#eef1ff'; });
-      drop.addEventListener('dragleave',function(){ drop.style.background='#fafafa'; });
-      drop.addEventListener('drop',     function(e){
-        e.preventDefault(); drop.style.background='#fafafa';
-        var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.type.startsWith('image/'); });
-        if(files.length) startProcess(files);
-      });
-    }
-    if(input){
-      input.addEventListener('change', function(e){
-        var files = Array.from(e.target.files).filter(function(f){ return f.type.startsWith('image/'); });
-        if(files.length) startProcess(files);
-      });
-    }
+  document.getElementById('drop-zone').addEventListener('click', function(){ document.getElementById('wv-input').click(); });
+  document.getElementById('drop-zone').addEventListener('dragover', function(e){ e.preventDefault(); this.style.background='#eef1ff'; });
+  document.getElementById('drop-zone').addEventListener('dragleave', function(){ this.style.background='#fafafa'; });
+  document.getElementById('drop-zone').addEventListener('drop', function(e){
+    e.preventDefault(); this.style.background='#fafafa';
+    var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.type.startsWith('image/'); });
+    if(files.length) startProcess(files);
   });
+  document.getElementById('wv-input').addEventListener('change', function(e){
+    var files = Array.from(e.target.files).filter(function(f){ return f.type.startsWith('image/'); });
+    if(files.length) startProcess(files);
+  });
+  document.getElementById('dl-btn').addEventListener('click', wvDownload);
+  document.getElementById('reset-btn').addEventListener('click', wvReset);
 
-  // 이미지를 MAX_SIZE로 리사이즈 후 base64 반환 (속도 핵심)
+  function sortFiles(f){ return f.slice().sort(function(a,b){ return a.name.localeCompare(b.name,undefined,{numeric:true}); }); }
+  function getExt(n){ var m=n.match(/\.([^.]+)$/); return m?'.'+m[1].toLowerCase():''; }
+
   function resizeToB64(file){
-    return new Promise(function(res, rej){
-      var img = new Image();
-      var url = URL.createObjectURL(file);
-      img.onload = function(){
-        var w = img.width, h = img.height;
-        if(w > MAX_SIZE || h > MAX_SIZE){
-          if(w > h){ h = Math.round(h * MAX_SIZE / w); w = MAX_SIZE; }
-          else      { w = Math.round(w * MAX_SIZE / h); h = MAX_SIZE; }
-        }
-        var canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    return new Promise(function(res,rej){
+      var img=new Image(), url=URL.createObjectURL(file);
+      img.onload=function(){
+        var w=img.width,h=img.height;
+        if(w>MAX_SIZE||h>MAX_SIZE){ if(w>h){h=Math.round(h*MAX_SIZE/w);w=MAX_SIZE;}else{w=Math.round(w*MAX_SIZE/h);h=MAX_SIZE;} }
+        var c=document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
         URL.revokeObjectURL(url);
-        var b64 = canvas.toDataURL('image/jpeg', QUALITY).split(',')[1];
-        res(b64);
+        res(c.toDataURL('image/jpeg',QUALITY).split(',')[1]);
       };
-      img.onerror = function(){ URL.revokeObjectURL(url); rej(); };
-      img.src = url;
+      img.onerror=function(){URL.revokeObjectURL(url);rej();};
+      img.src=url;
     });
-  }
-
-  function sortFiles(files){
-    return files.slice().sort(function(a,b){
-      return a.name.localeCompare(b.name, undefined, {numeric:true});
-    });
-  }
-
-  function getExt(name){
-    var m = name.match(/\.([^.]+)$/);
-    return m ? '.' + m[1].toLowerCase() : '';
   }
 
   async function tryReadBarcode(file){
-    var b64 = await resizeToB64(file);
-    var resp = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_data: b64, media_type: 'image/jpeg' })
-    });
-    var d = await resp.json();
-    return d.barcode || null;
+    var b64=await resizeToB64(file);
+    var resp=await fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image_data:b64,media_type:'image/jpeg'})});
+    var d=await resp.json();
+    return d.barcode||null;
   }
 
   async function startProcess(files){
-    processed = [];
-    var sorted = sortFiles(files);
+    processed=[];
+    var sorted=sortFiles(files);
     document.getElementById('wv-progress').style.display='block';
     document.getElementById('wv-result').style.display='none';
-    var total = sorted.length;
-
-    for(var i=0; i<sorted.length; i++){
-      var file = sorted[i];
-      document.getElementById('wv-prog-label').textContent = '(' + (i+1) + '/' + total + ') ' + file.name;
-      document.getElementById('wv-prog-count').textContent = Math.round((i+1)/total*100) + '%';
-      document.getElementById('wv-prog-fill').style.width = Math.round((i+1)/total*100) + '%';
-
-      var thumb = URL.createObjectURL(file);
-      var barcodeText = null, isTag = false;
-      try {
-        barcodeText = await tryReadBarcode(file);
-        isTag = (barcodeText !== null);
-      } catch(e){ console.error(file.name, e); }
-
-      processed.push({ file:file, original:file.name, thumb:thumb, isTag:isTag, barcodeText:barcodeText, newName:null, status:'pending' });
+    var total=sorted.length;
+    for(var i=0;i<sorted.length;i++){
+      var file=sorted[i];
+      document.getElementById('prog-label').textContent='('+(i+1)+'/'+total+') '+file.name;
+      document.getElementById('prog-count').textContent=Math.round((i+1)/total*100)+'%';
+      document.getElementById('prog-fill').style.width=Math.round((i+1)/total*100)+'%';
+      var thumb=URL.createObjectURL(file),barcodeText=null,isTag=false;
+      try{ barcodeText=await tryReadBarcode(file); isTag=(barcodeText!==null); }catch(e){ console.error(file.name,e); }
+      processed.push({file:file,original:file.name,thumb:thumb,isTag:isTag,barcodeText:barcodeText,newName:null,status:'pending'});
     }
     assignNames();
   }
 
   function assignNames(){
-    var startNum = parseInt(document.getElementById('wv-start').value);
-    var sep = document.getElementById('wv-sep').value;
-    var currentBC = null, idx = startNum;
-
-    for(var i=0; i<processed.length; i++){
-      var r = processed[i];
-      if(r.isTag){
-        currentBC = r.barcodeText; idx = startNum;
-        r.status = 'barcode'; r.newName = null;
-      } else {
-        var ext = getExt(r.original);
-        if(currentBC){
-          r.newName = currentBC + sep + String(idx).padStart(2,'0') + ext;
-          r.status = 'ok'; idx++;
-        } else {
-          r.newName = r.original; r.status = 'orphan';
-        }
+    var startNum=parseInt(document.getElementById('wv-start').value);
+    var sep=document.getElementById('wv-sep').value;
+    var currentBC=null,idx=startNum;
+    for(var i=0;i<processed.length;i++){
+      var r=processed[i];
+      if(r.isTag){ currentBC=r.barcodeText; idx=startNum; r.status='barcode'; r.newName=null; }
+      else{
+        var ext=getExt(r.original);
+        if(currentBC){ r.newName=currentBC+sep+String(idx).padStart(2,'0')+ext; r.status='ok'; idx++; }
+        else{ r.newName=r.original; r.status='orphan'; }
       }
     }
     renderResults();
@@ -234,75 +189,51 @@
   function renderResults(){
     document.getElementById('wv-progress').style.display='none';
     document.getElementById('wv-result').style.display='block';
-
-    var groups=0, imgs=0, orphan=0;
-    processed.forEach(function(r){
-      if(r.status==='barcode') groups++;
-      if(r.status==='ok') imgs++;
-      if(r.status==='orphan') orphan++;
-    });
-    var skipped = processed.filter(function(r){ return !r.isTag && r.status!=='orphan'; }).length;
-
-    document.getElementById('wv-st-groups').textContent = groups;
-    document.getElementById('wv-st-imgs').textContent = imgs;
-    document.getElementById('wv-st-fail').textContent = orphan;
-    document.getElementById('wv-st-skip').textContent = skipped;
-
-    var html = '';
-    processed.forEach(function(r, i){
-      if(r.status === 'barcode'){
-        html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0 6px;border-bottom:1px solid #eee;margin-top:12px;font-size:13px;font-weight:500;">'
-          + '<img src="'+r.thumb+'" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #eee;">'
-          + '<span style="color:#d97706;">▣ 바코드 태그</span>'
-          + '<span style="font-weight:600;font-family:monospace;font-size:14px;">'+r.barcodeText+'</span>'
-          + '</div>';
+    var groups=0,imgs=0,orphan=0;
+    processed.forEach(function(r){ if(r.status==='barcode')groups++; if(r.status==='ok')imgs++; if(r.status==='orphan')orphan++; });
+    var skipped=processed.filter(function(r){ return !r.isTag&&r.status!=='orphan'; }).length;
+    document.getElementById('st-groups').textContent=groups;
+    document.getElementById('st-imgs').textContent=imgs;
+    document.getElementById('st-fail').textContent=orphan;
+    document.getElementById('st-skip').textContent=skipped;
+    var html='';
+    processed.forEach(function(r,i){
+      if(r.status==='barcode'){
+        html+='<div class="group-header"><img src="'+r.thumb+'" class="thumb"><span style="color:#d97706;">▣ 바코드 태그</span><span style="font-weight:600;font-family:monospace;">'+r.barcodeText+'</span></div>';
       } else {
-        var bStyle = r.status==='ok' ? 'background:#edfaf3;color:#1a9e5c;' : 'background:#fff0f0;color:#e03e3e;';
-        var bText  = r.status==='ok' ? '완료' : '미연결';
-        html += '<div style="display:grid;grid-template-columns:36px 1fr 1fr 64px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:12px;">'
-          + '<img src="'+r.thumb+'" style="width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #eee;">'
-          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa;">'+r.original+'</span>'
-          + '<input value="'+(r.newName||'')+'" data-idx="'+i+'" class="wv-name-input" style="font-size:12px;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:100%;">'
-          + '<span style="font-size:11px;padding:2px 8px;border-radius:6px;font-weight:500;'+bStyle+'">'+bText+'</span>'
-          + '</div>';
+        var bc=r.status==='ok'?'badge-ok':'badge-fail';
+        var bt=r.status==='ok'?'완료':'미연결';
+        html+='<div class="file-row"><img src="'+r.thumb+'" class="thumb"><span class="name-orig">'+r.original+'</span><input class="name-input" data-idx="'+i+'" value="'+(r.newName||'')+'"><span class="badge '+bc+'">'+bt+'</span></div>';
       }
     });
-    document.getElementById('wv-list').innerHTML = html;
-
-    document.querySelectorAll('.wv-name-input').forEach(function(inp){
-      inp.addEventListener('change', function(){
-        processed[parseInt(this.dataset.idx)].newName = this.value;
-      });
+    document.getElementById('file-list').innerHTML=html;
+    document.querySelectorAll('.name-input').forEach(function(inp){
+      inp.addEventListener('change',function(){ processed[parseInt(this.dataset.idx)].newName=this.value; });
     });
-
-    document.getElementById('wv-dl-btn').style.display = imgs > 0 ? 'inline-block' : 'none';
+    document.getElementById('dl-btn').style.display=imgs>0?'inline-block':'none';
   }
 
   async function wvDownload(){
-    var btn = document.getElementById('wv-dl-btn');
-    btn.textContent = '생성 중...';
-    var zip = new JSZip();
-    for(var i=0; i<processed.length; i++){
-      var r = processed[i];
-      if(r.status === 'barcode') continue;
-      var ab = await r.file.arrayBuffer();
-      zip.file(r.newName || r.original, ab);
+    var btn=document.getElementById('dl-btn');
+    btn.textContent='생성 중...';
+    var zip=new JSZip();
+    for(var i=0;i<processed.length;i++){
+      var r=processed[i];
+      if(r.status==='barcode') continue;
+      zip.file(r.newName||r.original, await r.file.arrayBuffer());
     }
-    var blob = await zip.generateAsync({type:'blob'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'renamed_products.zip';
-    a.click();
+    var blob=await zip.generateAsync({type:'blob'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='renamed_products.zip'; a.click();
     URL.revokeObjectURL(a.href);
-    btn.textContent = 'ZIP 다운로드';
+    btn.textContent='ZIP 다운로드';
   }
 
   function wvReset(){
-    processed = [];
+    processed=[];
     document.getElementById('wv-result').style.display='none';
     document.getElementById('wv-progress').style.display='none';
     document.getElementById('wv-input').value='';
   }
-})();
 </script>
-<!-- ===== 바코드 파일명 변경 툴 FINAL2 끝 ===== -->
+</body>
+</html>
