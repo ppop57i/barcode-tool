@@ -147,7 +147,7 @@
 
   async function tryReadBarcode(file){
     var b64=await resizeToB64(file);
-    var resp=await fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image_data:b64,media_type:'image/jpeg'})});
+    var resp=await fetch(PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image_data:b64,media_type:file.type||'image/jpeg'})});
     var d=await resp.json();
     return d.barcode||null;
   }
